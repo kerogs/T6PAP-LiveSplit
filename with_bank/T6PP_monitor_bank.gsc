@@ -15,7 +15,7 @@ main()
 init()
 {
     flag_init("timer_start");
-    level.papm_version = "v1.2";
+    level.papm_version = "v2.1";
     level.split_number = 0;
     level thread on_player_connect();
 }
@@ -23,6 +23,8 @@ init()
 on_player_connect()
 {
     level waittill( "connected", player );
+    //DEBUG
+    //player thread player_origin_debug();
     if(getdvar("scr_allowFileIo") == "")
     {
         player iprintln("^8[^3T6EE^8][^5" + level.papm_version + "^8]^1 Unsupported plutonium version! Update your client");
@@ -41,7 +43,6 @@ on_player_connect()
     level thread game_over_wait();
     level thread gametime_monitor();
     level thread split_monitor();
-
     player thread on_player_spawned();
 }
 
@@ -98,7 +99,7 @@ split_monitor()
     switch(level.script)
     {
         case "zm_buried":
-            level.splits = strtok("paralyzer|power_on|mansion|pack_a_punch", "|");
+            level.splits = strtok("paralyzer|bank|power_on|mansion|pack_a_punch", "|");
             break;
 
         default:
@@ -154,6 +155,22 @@ check_split(split, is_flag)
                 }
                 break;
 
+            case "bank":
+                // Coordonées approximatives de la Banque dans Buried
+                bank_origin = (-313.049, -313.813, 8.125);  // ajuste selon ta map exacte
+                bank_radius = 50;                // rayon de détection
+
+                while (true)
+                {
+                    foreach(player in getplayers())
+                    {
+                        if (distance(player.origin, bank_origin) < bank_radius)
+                            return;
+                    }
+                    wait 0.05;
+                }
+                break;
+
             case "power_on":
                 while(!flag("power_on")) wait 0.05;
                 break;
@@ -194,6 +211,7 @@ check_split(split, is_flag)
                             // Détection Paralyzer PAP
                             if (isSubStr(weapon, "slowgun") && (isSubStr(weapon, "_upgraded_zm") || isSubStr(weapon, "_pap")))
                             {
+                                player iprintln("^7Well played, ^1BornFat ^7didn't think you'd make it! (jk, wp)");
                                 return;
                             }
                         }
@@ -211,6 +229,7 @@ is_flag(split_name)
     switch(split_name)
     {
         case "paralyzer":
+        case "bank":
         case "power_on":
         case "mansion":
         case "pack_a_punch":
@@ -294,5 +313,15 @@ on_player_spawned()
     {
         self waittill("spawned_player");
         self thread show_start_message();
+    }
+}
+
+player_origin_debug()
+{
+    self endon("disconnect");
+    for (;;)
+    {
+        self iprintln("Your origin: " + self.origin);
+        wait 1;  // Affiche toutes les secondes
     }
 }

@@ -193,7 +193,7 @@ check_split(split, is_flag)
                             // Détection Paralyzer PAP
                             if (isSubStr(weapon, "slowgun") && (isSubStr(weapon, "_upgraded_zm") || isSubStr(weapon, "_pap")))
                             {
-                                player iprintln("^7Well played, ^1BornFat ^7didn't think you'd make it! (jk, wp)");
+                                player iprintln("^7Well played, ^1BornFat ^7didn't think you'd make it! (jk wp)");
                                 return;
                             }
                         }
